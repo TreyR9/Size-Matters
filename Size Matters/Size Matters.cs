@@ -89,7 +89,7 @@ public class Plugin : IPlugin
         }
     }
     //The fancy schmancy GUI, no more manual file editing required!
-    public void OnImGuiRender()
+    public async void OnImGuiRender()
     {
         ImGui.Text("Adjust the scale of each player slot below.");
         ImGui.Text("Drag to use as a slider, or double click to manually input.");
@@ -119,13 +119,13 @@ public class Plugin : IPlugin
             try
             {
                 //Runs the Writer task, which writes everything to the config file
-                Writer();
+                await Writer();
                 Log.Info($"Saved player sizes to " + path);
             }
             catch (Exception e)
             {
-                //Error handling
-                Log.Error("Exception: " + e.Message);
+                //Error handling IF YOU SEE THIS IN THE LOG THEN FUSS AT ME
+                Log.Error("Save exception: " + e.Message);
             }
         }
         if (ImGui.BeginItemTooltip())
@@ -136,34 +136,22 @@ public class Plugin : IPlugin
     }
     public void OnUpdate(float dt)
     {
-        //This checks for the user's save slot every tick. It's in a try-catch statement because the MainPlayer only exists once the save has been loaded.
+        //This checks for the user's save slot every tick.
         //It's a bit scuffed but it works, at least until the OnSelectSaveSlot method is fixed.
         //It pulls the save slot number, from 0 to 2, from the hex offset. Shoutout to Fexty for providing me with this code!
         var userData = SingletonManager.GetSingleton("sUserData");
-        var saveSlot = userData.Get<int>(0xA0);
+        var saveSlot = userData?.Get<int>(0xA0);
         if (saveSlot == 0)
         {
-            try
-            {
-                Player.MainPlayer.Resize(slotonescale);
-            }
-            catch { }
+            Player.MainPlayer?.Resize(slotonescale);
         }
         if (saveSlot == 1)
         {
-            try
-            {
-                Player.MainPlayer.Resize(slottwoscale);
-            }
-            catch { }
+            Player.MainPlayer?.Resize(slottwoscale);
         }
         if (saveSlot == 2)
         {
-            try
-            {
-                Player.MainPlayer.Resize(slotthreescale);
-            }
-            catch { }
+            Player.MainPlayer?.Resize(slotthreescale);
         }
         
     }
